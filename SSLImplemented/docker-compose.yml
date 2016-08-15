@@ -24,7 +24,7 @@ nginx:
     restart: always                      
     volumes:
         - ./conf:/etc/nginx/
-        - ./ssl/www.lotp.xyz:/etc/ssl/
+        - ./ssl/:/etc/ssl/
     ports:
         - "80:80"
         - "443:443"

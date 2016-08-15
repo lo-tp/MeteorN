@@ -37,8 +37,8 @@ After finishing these two commands, you will find a bundle file in **/tmp**.(Nam
 ~~~shell
 cd /tmp
 git clone https://github.com/lo-tp/MeteorN.git
-cp projectName.tar.gz  MeteorN/basic
-cd MeteorN/basic
+cp projectName.tar.gz  MeteorN/Basic
+cd MeteorN/Basic
 ~~~
 
 ###  Configugirations
