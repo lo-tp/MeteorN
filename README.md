@@ -32,7 +32,7 @@ meteor build /tmp --architecture os.linux.x86_64
 
 After finishing these two commands, you will find a bundle file in **/tmp**.(Named as projectName.tar.gz)
 
-###  Clone MeteorN
+###  2. Clone MeteorN
 
 ~~~shell
 cd /tmp
@@ -41,7 +41,7 @@ cp projectName.tar.gz  MeteorN/Basic
 cd MeteorN/Basic
 ~~~
 
-###  Configugirations
+###  3. 3. 3. Configugirations
 
 Change the node version in accordance with the rules described below:
 
@@ -64,7 +64,7 @@ Open **docker-compose.yml** and edit this line:
 Change `http://127.0.0.1` to your domain name.
 
 
-### Build And Run
+### 4. Build And Run
 ~~~shell
 docker-compose build
 docker-compose up
