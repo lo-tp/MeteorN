@@ -80,7 +80,7 @@ All the relevant files are located in the `MeteorN/SSLImplemented` folder.
 
 There is one more thing to be done before using this version.
 
-Firstly you'll have to copy your SSL cirtificate file and SSL cirtificate key to the `ssl` folder respectively as cert.pem and private.pem.
+Firstly you'll have to copy your SSL cirtificate file and SSL cirtificate key to the `ssl` folder respectively as cert.pem and privkey.pem.
 
 
 Then run `docker-compose up` and your meteor app is ready to go with SSL support.
