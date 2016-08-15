@@ -41,7 +41,7 @@ cp projectName.tar.gz  MeteorN/Basic
 cd MeteorN/Basic
 ~~~
 
-###  3. 3. 3. Configugirations
+###  3. Configugirations
 
 Change the node version in accordance with the rules described below:
 
@@ -55,7 +55,7 @@ This can be done by opening **dockerfiles/node.dockerfile** and edit this line:
 FROM node:xxx
 ~~~
 
-Open **docker-compose.yml** and edit this line:
+Then open **docker-compose.yml** and edit this line:
 
 ~~~
 - ROOT_URL=http://127.0.0.1
@@ -80,11 +80,14 @@ All the relevant files are located in the `MeteorN/SSLImplemented` folder.
 
 There is one more thing to be done before using this version.
 
-Firstly you'll have to copy your SSL cirtificate file and SSL cirtificate key to the `ssl` folder respectively as cert.pem and privkey.pem.
-
+You'll have to copy your SSL cirtificate file and SSL cirtificate key to the `MeteorN/SSLImplemented/ssl` folder respectively as cert.pem and privkey.pem.
 
 Then run `docker-compose up` and your meteor app is ready to go with SSL support.
 
 **One thing to mention: The http traffic is redirected to https by default.**
 
 If you want to keep the http working, you can edit the Nginx configure file located at `conf` folder.
+
+## Use the Nginx Reverse Proxy to Do Other Thing
+
+You can edit the `conf/nginx.conf` to implement other functionalities with the reverse proxy.
