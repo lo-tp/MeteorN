@@ -1,0 +1,32 @@
+node:
+    container_name: meteor_server
+    build: .
+    dockerfile: ./dockerfiles/node.dockerfile
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/meteor
+      - ROOT_URL=http://127.0.0.1
+      - PORT=8080
+    command:  node main.js
+    restart: always                      
+    links:
+        - mongodb:mongo
+mongodb:
+    image: mongo:3.2.8
+    container_name: mongo_db
+    restart: always                      
+    volumes:
+        - ./db/dbfiles/:/data/db/
+        - ./db/meteor/:/tmp/dump/
+nginx:
+    dockerfile: ./dockerfiles/nginx.dockerfile
+    build: .
+    container_name: nginx_ssl_proxy
+    restart: always                      
+    volumes:
+        - ./conf:/etc/nginx/
+        - ./ssl/www.lotp.xyz:/etc/ssl/
+    ports:
+        - "80:80"
+        - "443:443"
+    links:
+        - node:meteor
