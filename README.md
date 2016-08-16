@@ -41,7 +41,7 @@ cp projectName.tar.gz  MeteorN/Basic
 cd MeteorN/Basic
 ~~~
 
-###  3. Configugirations
+###  3. Configurations
 
 Change the node version in accordance with the rules described below:
 
