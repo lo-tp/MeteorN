@@ -1,0 +1,18 @@
+mongodb:
+    image: mongo:3.2.8
+    container_name: mongo_test
+    restart: always                      
+    volumes:
+        - ./db/dbfiles/:/data/db/
+        - ./db/meteor/:/tmp/dump/
+nginx:
+    dockerfile: ./dockerfiles/nginx.dockerfile
+    build: .
+    container_name: nginx_test
+    restart: always                      
+    volumes:
+        - ./conf:/etc/nginx/
+        - ./ssl/:/etc/ssl/
+    ports:
+        - "80:80"
+        - "443:443"
