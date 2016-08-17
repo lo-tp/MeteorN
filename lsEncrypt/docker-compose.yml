@@ -28,6 +28,9 @@ nginx:
         - "80:80"
         - "443:443"
 
-    command: ["nginx", "-c", "/root/conf/nginx.conf", "-g", "daemon off;"]
+    command: [sh, /root/conf/entrypoint.sh]
     links:
         - node:meteor
+    environment:
+        - DOMAIN=www.test.xyz
+        - MAIL=test@hotmail.com
