@@ -12,6 +12,10 @@ Use the `Basic` version if you do not need SSL.
 
 Otherwise, check the `SSLImplementd` one out.
 
+## Which Branch to use:
+- master for newest version
+- pre1.4 for older version
+
 ## How to Use the Basic Version
 
 
