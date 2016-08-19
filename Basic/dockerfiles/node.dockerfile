@@ -1,4 +1,4 @@
-FROM node:4
+FROM node:0.10.43
 
 ENV bundleFile=bundle.tar.gz
 
