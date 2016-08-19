@@ -1,4 +1,4 @@
-FROM node:0.10.43
+FROM node:0.10.46
 
 ENV bundleFile=bundle.tar.gz
 
@@ -7,5 +7,5 @@ COPY bundle.tar.gz /app
 WORKDIR /app
 RUN tar -xf bundle.tar.gz
 WORKDIR /app/bundle/programs/server
-RUN npm    install 
+RUN npm   install 
 WORKDIR /app/bundle

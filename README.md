@@ -92,6 +92,71 @@ Then run `docker-compose up` and your meteor app is ready to go with SSL support
 
 If you want to keep the http working, you can edit the Nginx configure file located at `conf` folder.
 
+## How to Use the lsEncrypt Version
+
+In addtion to the steps described in the [Basic Version](#how-to-use-the-basic-version).
+
+Some more file modifications are necessary.
+
+Find these lines in `docker-compose.yml`.
+```yml
+environment:
+	- DOMAIN=www.test.xyz
+	- MAIL=test@hotmail.com
+```
+Change the values of `MAIL` and `DOMAIN` to your domain name and email address.
+
+Then open `conf/cert.conf`.
+```
+domains = www.test.xyz
+email=test@hotmail.com
+rsa-key-size = 4096
+authenticator = webroot
+webroot-path = /tmp
+```
+Change the first two lines to your domain name and email address.
+
+Also change all the domain names from **www.test.xyz** to your own contained in `conf/nginx.conf`.
+
+```
+http{
+	upstream app_servers {
+		server meteor:8080;
+	}
+	server {
+		listen 80 ;
+		server_name www.test.xyz                				#This Line
+		location '/.well-known/acme-challenge' {
+			...
+		}
+		location / {
+			return    301 https://$server_name$request_uri;
+		}
+	}
+	server { 
+		listen 443; 
+		ssl on; 
+		ssl_certificate /etc/letsencrypt/live/www.test.xyz/cert.pem;            #This Line
+		ssl_certificate_key /etc/letsencrypt/live/www.test.xyz/privkey.pem;     #This Line
+		...
+		location / {
+		...
+		}
+	}
+}
+
+events {
+	worker_connections 1024;
+}
+```
+
+Now run `docker-compose up` and wait for the **Nginx** container to automatically get the necessary SSL files from [Let's Encrypt][lpt] and serve your website in https mode.
+
+**Notice: Don't play with this version too frequently, there is a [quota][qt] on how many certificates you can get per week**.
+
 ## Use the Nginx Reverse Proxy to Do Other Thing
 
 You can edit the `conf/nginx.conf` to implement other functionalities with the reverse proxy.
+
+[lpt]:https://letsencrypt.org/
+[qt]:https://letsencrypt.org/docs/rate-limits/
