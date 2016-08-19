@@ -116,7 +116,41 @@ webroot-path = /tmp
 ```
 Change the first two lines to your domain name and email address.
 
-Now run `docker-compose up` and wait for the **Nginx** container to automatically get the necessary SSL files from [Let's Encrypt][lpt] and server your website in https mode.
+Also change all the domain names from **www.test.xyz** to your own contained in `conf/nginx.conf`.
+
+```
+http{
+	upstream app_servers {
+		server meteor:8080;
+	}
+	server {
+		listen 80 ;
+		server_name www.test.xyz                				#This Line
+		location '/.well-known/acme-challenge' {
+			...
+		}
+		location / {
+			return    301 https://$server_name$request_uri;
+		}
+	}
+	server { 
+		listen 443; 
+		ssl on; 
+		ssl_certificate /etc/letsencrypt/live/www.test.xyz/cert.pem;            #This Line
+		ssl_certificate_key /etc/letsencrypt/live/www.test.xyz/privkey.pem;     #This Line
+		...
+		location / {
+		...
+		}
+	}
+}
+
+events {
+	worker_connections 1024;
+}
+```
+
+Now run `docker-compose up` and wait for the **Nginx** container to automatically get the necessary SSL files from [Let's Encrypt][lpt] and serve your website in https mode.
 
 **Notice: Don't play with this version too frequently, there is a [quota][qt] on how many certificates you can get per week**.
 
