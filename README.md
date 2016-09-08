@@ -16,7 +16,7 @@ Otherwise, check the `SSLImplementd` one out.
 - Don't play with  **lsEncrypt** too frequently, because there is a [quota][qt] on how many certificates you can get per week**.
 
 ## Which Branch to use:
-- master for newest version
+- master for the newest version of Meteor
 - pre1.4 for older version
 
 ## How to Use the Basic Version
