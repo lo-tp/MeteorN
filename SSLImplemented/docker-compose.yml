@@ -25,6 +25,8 @@ services:
         restart: always                      
         volumes:
             - ./script/:/tmp/script/
+            - ./db/dbfiles/:/data/db/
+            - ./db/meteor/:/tmp/dump/
         command: [mongod,--replSet,meteor]
         networks:
                 mongo_net:

@@ -24,6 +24,8 @@ services:
         image: mongo:3.2.8
         restart: always                      
         volumes:
+            - ./db/dbfiles/:/data/db/
+            - ./db/meteor/:/tmp/dump/
             - ./script/:/tmp/script/
         command: [mongod,--replSet,meteor]
         networks:
