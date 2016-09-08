@@ -11,6 +11,9 @@ This project is composed of two parts.
 Use the `Basic` version if you do not need SSL.
 
 Otherwise, check the `SSLImplementd` one out.
+## Notice
+- Ensure docker compose **v1.6**  or above is installed.
+- Don't play with  **lsEncrypt** too frequently, because there is a [quota][qt] on how many certificates you can get per week**.
 
 ## Which Branch to use:
 - master for newest version
@@ -45,37 +48,17 @@ cp projectName.tar.gz  MeteorN/Basic
 cd MeteorN/Basic
 ~~~
 
-###  3. Configurations
-
-Change the node version in accordance with the rules described below:
-
-- Node 4.4.7 for Meteor 1.4.x
-- Node 0.10.43 for Meteor 1.3.x and earlier
-
-
-This can be done by opening **dockerfiles/node.dockerfile** and edit this line:
-
-~~~
-FROM node:xxx
-~~~
-
-Then open **docker-compose.yml** and edit this line:
-
-~~~
-- ROOT_URL=http://127.0.0.1
-~~~
-
-Change `http://127.0.0.1` to your domain name.
-
-
-### 4. Build And Run
+### 3. Build And Run
 ~~~shell
 docker-compose build
 docker-compose up
 ~~~
 You can also run `docker-compose up -d` to run your application in the background.
 
-Now your app is happily running at your domain name.
+If this is your first time running or you have recreated the containers, then you would have to create the **mongo replica set**.
+It's very easy, just run `docker exec   -it primary mongo /tmp/script/primary.js` and you are done.
+
+Now your app is happily running on your server.
 
 ## How to Use the SSLImplemented Version
 It's largely similiar to the use of the `Basic` version.
@@ -152,11 +135,80 @@ events {
 
 Now run `docker-compose up` and wait for the **Nginx** container to automatically get the necessary SSL files from [Let's Encrypt][lpt] and serve your website in https mode.
 
-**Notice: Don't play with this version too frequently, there is a [quota][qt] on how many certificates you can get per week**.
+## The Configurations about the Mongo Replica Set.
+
+Two files are pertinent to the configuration of the mongo replica set of your app.
+- `./docker-compose.yml`.
+- `./script/primary.js`.
+
+`./docker-compose.yml` is where we define our replica set.
+```
+version: '2'
+services: 
+   node:
+       container_name: meteor_test
+       build: 
+         context: .
+         dockerfile: ./dockerfiles/node.dockerfile
+       environment:
+         - MONGO_URL=mongodb://pri:27017/meteor?replicaSet=test&readPreference=primaryPreferred&w=majority
+         - MONGO_OPG_URL=mongodb://pri:27017/local?replicaSet=test
+         - ROOT_URL=http://127.0.0.1
+         - PORT=8080
+       command:  node main.js
+       restart: always                      
+       networks:
+               mongo_net:
+                       aliases:
+                                   - app
+       ports:
+           - 8080:8080
+   primary:
+       container_name: primary_test
+       image: mongo:3.2.8
+       restart: always                      
+       volumes:
+           - ./script/:/tmp/script/
+       command: [mongod,--replSet,test]
+       networks:
+               mongo_net:
+                       aliases:
+                               - pri
+networks:
+     mongo_net:
+```
+Take this snippet as an example,we defined two docker services, one to run the app and one to serve as a primary in the mongo replica set.
+
+In this docker-compose file, a subnet named **mongo_net** and all the two services above have alias in this subnet.
+All the aliases are used to compose the **MONGO_URL** and **MONGO_OPG_URL** environment variables for the node service.
+
+Then let's check the `./script/primary.js`.
+```js
+var secondaries=['s1'];
+var arb='arb';
+rs.initiate();
+secondaries.forEach(function(address){
+  print(address);
+  rs.add(address);
+});
+rs.addArb(arb);
+rs.conf();
+```
+What this file does is to initiate a replica set and add the secondaries and arbiter to it if existing.
+
+The `secondaries` and the `arb` variable are where you should store the corresponding aliases.
+
+Advanced replica set configuration can be achived by modifying this java script file.
+
+Use this project as a starting point if you want to incorporate other remote mongo instances into your replica set.
+
+For more infomation about the configuration of mongo replica set, check this [page][repconf].
 
 ## Use the Nginx Reverse Proxy to Do Other Thing
 
 You can edit the `conf/nginx.conf` to implement other functionalities with the reverse proxy.
 
+
 [lpt]:https://letsencrypt.org/
+[repconf]:https://docs.mongodb.com/manual/reference/replication/
 [qt]:https://letsencrypt.org/docs/rate-limits/

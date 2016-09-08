@@ -1,36 +1,74 @@
-node:
-    container_name: meteor_test
-    build: .
-    dockerfile: ./dockerfiles/node.dockerfile
-    environment:
-      - MONGO_URL=mongodb://mongo:27017/meteor
-      - ROOT_URL=http://127.0.0.1
-      - PORT=8080
-    command:  node main.js
-    restart: always                      
-    links:
-        - mongodb:mongo
-mongodb:
-    image: mongo:3.2.8
-    container_name: mongo_test
-    restart: always                      
-    volumes:
-        - ./db/dbfiles/:/data/db/
-        - ./db/meteor/:/tmp/dump/
-nginx:
-    dockerfile: ./dockerfiles/nginx.dockerfile
-    build: .
-    container_name: nginx_test
-    restart: always                      
-    volumes:
-        - ./conf:/root/conf/:ro
-    ports:
-        - "80:80"
-        - "443:443"
+version: '2'
+services: 
+    node:
+        container_name: meteor_server
+        build:
+            context: .
+            dockerfile: ./dockerfiles/node.dockerfile
+        environment:
+          - MONGO_URL=mongodb://s1:27017,pri:27017/meteor?replicaSet=meteor&readPreference=primaryPreferred&w=majority
+          - MONGO_OPG_URL=mongodb://s1:27017,pri:27017/local?replicaSet=meteor
+          - ROOT_URL=http://127.0.0.1
+          - PORT=8080
+        command:  node main.js
+        restart: always                      
+        networks:
+                mongo_net:
+                        aliases:
+                                    - app
+                app_net:
+                        aliases:
+                                    - meteor
+    primary:
+        container_name: primary
+        image: mongo:3.2.8
+        restart: always                      
+        volumes:
+            - ./script/:/tmp/script/
+        command: [mongod,--replSet,meteor]
+        networks:
+                mongo_net:
+                        aliases:
+                                - pri
 
-    command: [sh, /root/conf/entrypoint.sh]
-    links:
-        - node:meteor
-    environment:
-        - DOMAIN=www.test.xyz
-        - MAIL=test@hotmail.com
+    arbiter:
+        image: mongo:3.2.8
+        container_name: arbiter
+        restart: always                      
+        command: [mongod,--replSet,meteor]
+        networks:
+                mongo_net:
+                        aliases:
+                                - arb
+
+    secondary1:
+        image: mongo:3.2.8
+        container_name: secondary
+        restart: always                      
+        command: [mongod,--replSet,meteor]
+        networks:
+                mongo_net:
+                        aliases:
+                                - s1
+    nginx:
+        build:
+            context: .
+            dockerfile: ./dockerfiles/nginx.dockerfile
+        container_name: nginx
+        restart: always                      
+        volumes:
+            - ./conf:/root/conf/:ro
+        ports:
+            - "80:80"
+            - "443:443"
+        command: [sh, /root/conf/entrypoint.sh]
+        networks:
+                app_net:
+                        aliases:
+                                    - nginx
+        environment:
+            - DOMAIN=www.test.xyz
+            - MAIL=test@hotmail.com
+networks:
+     mongo_net:
+     app_net:
