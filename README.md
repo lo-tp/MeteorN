@@ -204,6 +204,14 @@ Use this project as a starting point if you want to incorporate other remote mon
 
 For more infomation about the configuration of mongo replica set, check this [page][repconf].
 
+Make sure every is ok and fire up your project with `docker-compose up`. 
+
+Now All you have to do is to open a bash inside your primary mongo instance: `docker exec -it primary_test bash`,
+
+Run the js script to initialize the mongo replica set inside the the previous opened bash: `mongo /tmp/script/primary.js`
+
+After all these, you project is ready to go.
+
 ## Use the Nginx Reverse Proxy to Do Other Thing
 
 You can edit the `conf/nginx.conf` to implement other functionalities with the reverse proxy.
